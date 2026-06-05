@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vedank Music — Official Distribution</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════ RESET & ROOT ═══════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#FFD700;
+  --gold2:#FFA500;
+  --red:#E8001E;
+  --red2:#FF2F2F;
+  --bg:#04020A;
+  --bg2:#080415;
+  --glass:rgba(255,255,255,0.05);
+  --border:rgba(255,215,0,0.15);
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Exo 2',sans-serif;
+  background:var(--bg);
+  color:#fff;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* ═══════════════════ CURSOR ═══════════════════ */
+#cur{position:fixed;width:12px;height:12px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);box-shadow:0 0 14px var(--gold),0 0 28px var(--gold);transition:background .2s,transform .1s}
+#cur-ring{position:fixed;width:40px;height:40px;border:1.5px solid rgba(255,215,0,.5);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:all .18s ease}
+
+/* ═══════════════════ PARTICLES / BG ═══════════════════ */
+#particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.particle{position:absolute;border-radius:50%;animation:drift linear infinite;opacity:0}
+@keyframes drift{
+  0%{opacity:0;transform:translateY(100vh) translateX(0) scale(0)}
+  10%{opacity:.6}
+  90%{opacity:.3}
+  100%{opacity:0;transform:translateY(-10vh) translateX(40px) scale(1.5)}
+}
+
+/* ═══════════════════ NOISE OVERLAY ═══════════════════ */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:1;opacity:.4
+}
+
+/* ═══════════════════ WAVEFORM TOP ═══════════════════ */
+#wave-top{
+  position:relative;z-index:10;
+  display:flex;align-items:center;justify-content:center;gap:3px;
+  padding:18px 20px 0;height:70px;
+}
+.wbar{
+  width:4px;border-radius:6px;
+  background:linear-gradient(to top,var(--red),var(--gold));
+  animation:wv 1s ease-in-out infinite;
+  transform-origin:bottom;box-shadow:0 0 6px var(--red2);
+}
+@keyframes wv{0%,100%{transform:scaleY(.1)}50%{transform:scaleY(1)}}
+
+/* ═══════════════════ HERO ═══════════════════ */
+.hero{
+  position:relative;z-index:10;
+  text-align:center;
+  padding:40px 20px 20px;
+  min-height:90vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 40%, rgba(232,0,30,0.12) 0%, transparent 70%),
+             radial-gradient(ellipse 60% 40% at 50% 60%, rgba(255,215,0,0.06) 0%, transparent 70%);
+  pointer-events:none
+}
+
+/* Logo */
+.logo-wrap{
+  position:relative;display:inline-block;
+  width:200px;height:200px;
+  animation:logoFloat 5s ease-in-out infinite;
+}
+@keyframes logoFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-18px) rotate(2deg)}}
+.logo-ring{
+  position:absolute;inset:-20px;border-radius:50%;
+  border:2px solid transparent;
+  background:conic-gradient(var(--gold),var(--red),var(--gold)) border-box;
+  -webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);
+  mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  animation:spin 8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.logo-ring2{
+  position:absolute;inset:-35px;border-radius:50%;
+  border:1px solid rgba(255,215,0,0.2);
+  animation:spin 14s linear infinite reverse;
+}
+.logo-img{
+  width:200px;height:200px;border-radius:50%;
+  object-fit:cover;
+  box-shadow:0 0 50px rgba(255,215,0,0.3),0 0 100px rgba(232,0,30,0.2);
+}
+.logo-glow{
+  position:absolute;inset:-50px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,215,0,0.15),transparent 70%);
+  animation:glowPulse 3s ease-in-out infinite;
+}
+@keyframes glowPulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.1)}}
+
+/* Title */
+.hero-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(52px,11vw,110px);
+  line-height:.95;letter-spacing:4px;
+  margin-top:30px;
+  animation:titleIn 1s ease both;
+}
+@keyframes titleIn{from{opacity:0;transform:translateY(30px) scale(.9)}to{opacity:1;transform:none}}
+.t-gold{
+  color:var(--gold);
+  text-shadow:0 0 20px var(--gold),0 0 60px rgba(255,215,0,0.4);
+  display:block;
+}
+.t-red{
+  color:var(--red2);
+  text-shadow:0 0 20px var(--red2),0 0 60px rgba(232,0,30,0.4);
+  display:block;
+}
+
+/* Official / Coming Soon */
+.official-badge{
+  display:inline-flex;align-items:center;gap:10px;
+  margin-top:16px;
+  padding:8px 22px;border-radius:50px;
+  background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,215,0,0.05));
+  border:1px solid rgba(255,215,0,0.3);
+  font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:4px;
+  color:var(--gold);
+  animation:badgePulse 2.5s ease-in-out infinite;
+}
+@keyframes badgePulse{0%,100%{box-shadow:0 0 10px rgba(255,215,0,0.2)}50%{box-shadow:0 0 25px rgba(255,215,0,0.5)}}
+.badge-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+.coming-soon{
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(18px,3.5vw,36px);
+  letter-spacing:5px;margin-top:18px;
+  background:linear-gradient(90deg,var(--gold),var(--gold2),var(--red2),var(--gold));
+  background-size:300% 100%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shimmer 3s linear infinite;
+}
+@keyframes shimmer{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+
+/* Genres */
+.genres-wrap{
+  margin-top:28px;max-width:700px;
+  font-size:clamp(14px,2vw,18px);
+  color:rgba(255,255,255,0.75);
+  line-height:2;letter-spacing:1px;
+  animation:fadeUp 1.2s ease both .3s;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.genre-tag{
+  display:inline-block;
+  padding:4px 14px;margin:4px;border-radius:20px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  transition:all .3s;cursor:default;
+}
+.genre-tag:hover{background:rgba(255,215,0,0.15);border-color:rgba(255,215,0,0.4);color:var(--gold)}
+
+/* Scroll hint */
+.scroll-hint{
+  margin-top:40px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.3);
+  animation:fadeUp 1.5s ease both .8s;
+}
+.scroll-arrow{
+  width:24px;height:24px;border-right:2px solid rgba(255,215,0,0.4);border-bottom:2px solid rgba(255,215,0,0.4);
+  transform:rotate(45deg);animation:arrowBounce 1.5s ease-in-out infinite;
+}
+@keyframes arrowBounce{0%,100%{transform:rotate(45deg) translateY(0)}50%{transform:rotate(45deg) translateY(6px)}}
+
+/* ═══════════════════ SECTION COMMON ═══════════════════ */
+.section{
+  position:relative;z-index:10;
+  padding:80px 40px;
+  max-width:1400px;margin:0 auto;
+}
+.sec-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(32px,6vw,60px);
+  letter-spacing:4px;
+  text-align:center;margin-bottom:8px;
+}
+.sec-sub{
+  text-align:center;font-size:14px;letter-spacing:3px;
+  color:rgba(255,255,255,0.4);margin-bottom:50px;
+  font-family:'Orbitron',sans-serif;
+}
+.divider{
+  width:120px;height:2px;margin:10px auto 0;
+  background:linear-gradient(90deg,transparent,var(--gold),var(--red),transparent);
+}
+
+/* Fade-in */
+.reveal{opacity:0;transform:translateY(50px);transition:opacity .7s ease,transform .7s ease}
+.reveal.shown{opacity:1;transform:none}
+
+/* ═══════════════════ PLATFORM CARDS ═══════════════════ */
+.platform-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:20px;
+}
+.pcard{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:20px;padding:24px 16px;
+  text-align:center;
+  transition:all .35s cubic-bezier(.23,1,.32,1);
+  animation:cardFloat 6s ease-in-out infinite;
+  cursor:default;
+  position:relative;overflow:hidden;
+}
+.pcard::before{
+  content:'';position:absolute;inset:0;border-radius:20px;
+  background:linear-gradient(135deg,rgba(255,215,0,0.08),transparent);
+  opacity:0;transition:opacity .35s;
+}
+.pcard:hover::before{opacity:1}
+.pcard:hover{
+  transform:translateY(-10px) scale(1.04);
+  border-color:rgba(255,215,0,0.35);
+  box-shadow:0 20px 50px rgba(0,0,0,0.5),0 0 30px rgba(255,215,0,0.15);
+}
+@keyframes cardFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.pcard img{
+  width:80px;height:80px;object-fit:contain;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+  transition:transform .35s;
+}
+.pcard:hover img{transform:scale(1.15) rotate(3deg)}
+.pcard h3{
+  margin-top:12px;font-size:13px;font-weight:600;
+  font-family:'Exo 2',sans-serif;letter-spacing:1px;
+  color:rgba(255,255,255,0.85);
+}
+
+/* placeholder card (no image) */
+.pcard-placeholder img{
+  width:80px;height:80px;border-radius:16px;
+  background:linear-gradient(135deg,rgba(255,215,0,0.2),rgba(232,0,30,0.2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);
+  object-fit:unset;
+}
+.no-img-box{
+  width:80px;height:80px;border-radius:16px;
+  background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(232,0,30,0.15));
+  border:1px solid rgba(255,215,0,0.25);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto;
+  font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold);
+  letter-spacing:1px;
+}
+
+/* ═══════════════════ CALLER TUNE SECTION ═══════════════════ */
+#caller-section{
+  position:relative;
+  background:linear-gradient(180deg,transparent,rgba(255,215,0,0.04),transparent);
+  border-top:1px solid rgba(255,215,0,0.1);
+  border-bottom:1px solid rgba(255,215,0,0.1);
+  padding:80px 40px;
+  overflow:hidden;
+}
+#caller-section::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 50% at 50% 50%,rgba(255,215,0,0.06),transparent);
+  pointer-events:none;
+}
+.caller-label{
+  position:absolute;top:20px;right:30px;
+  font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:4px;
+  color:rgba(255,215,0,0.4);
+}
+
+.ct-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:24px;margin-top:20px;
+}
+.ct-card{
+  background:linear-gradient(135deg,rgba(255,215,0,0.06),rgba(255,47,47,0.04));
+  border:1px solid rgba(255,215,0,0.2);
+  border-radius:24px;padding:30px 20px;
+  text-align:center;
+  transition:all .4s cubic-bezier(.23,1,.32,1);
+  position:relative;overflow:hidden;
+}
+.ct-card::after{
+  content:'';position:absolute;
+  bottom:-60px;left:50%;transform:translateX(-50%);
+  width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,215,0,0.2),transparent 70%);
+  transition:all .4s;
+}
+.ct-card:hover::after{bottom:-20px;opacity:.8}
+.ct-card:hover{
+  transform:translateY(-12px);
+  border-color:rgba(255,215,0,0.5);
+  box-shadow:0 25px 60px rgba(0,0,0,0.6),0 0 40px rgba(255,215,0,0.2);
+}
+.ct-card img{width:90px;height:90px;object-fit:contain;position:relative;z-index:1}
+.ct-card h3{
+  margin-top:14px;font-family:'Orbitron',sans-serif;
+  font-size:16px;letter-spacing:2px;
+  color:var(--gold);position:relative;z-index:1;
+}
+.ct-card p{
+  font-size:12px;color:rgba(255,255,255,0.5);
+  margin-top:6px;letter-spacing:1px;
+}
+.ct-pulse{
+  position:absolute;top:12px;right:12px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--gold);
+  animation:blink 1.5s ease-in-out infinite;
+  box-shadow:0 0 8px var(--gold);
+}
+
+/* ═══════════════════ EMAIL / FOOTER ═══════════════════ */
+.email-section{
+  position:relative;z-index:10;
+  padding:60px 40px 40px;
+  text-align:center;
+}
+.email-card{
+  max-width:600px;margin:0 auto;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,215,0,0.2);
+  border-radius:30px;padding:50px 40px;
+  position:relative;overflow:hidden;
+  transition:all .4s;
+}
+.email-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,215,0,0.06),rgba(232,0,30,0.04));
+  opacity:0;transition:.4s;
+}
+.email-card:hover::before{opacity:1}
+.email-card:hover{box-shadow:0 0 60px rgba(255,215,0,0.15);border-color:rgba(255,215,0,0.4)}
+.email-label{
+  font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:5px;
+  color:rgba(255,255,255,0.4);margin-bottom:16px;
+}
+.email-text{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(22px,4vw,38px);letter-spacing:2px;
+  color:var(--gold);
+  text-shadow:0 0 20px rgba(255,215,0,0.4);
+}
+
+/* Footer line */
+footer{
+  position:relative;z-index:10;
+  text-align:center;padding:30px;
+  border-top:1px solid rgba(255,255,255,0.05);
+  font-size:12px;color:rgba(255,255,255,0.25);
+  letter-spacing:2px;font-family:'Orbitron',sans-serif;
+}
+
+/* ═══════════════════ SECTION BG GLOW ═══════════════════ */
+.bg-glow{
+  position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;
+}
+
+/* ═══════════════════ MARQUEE ═══════════════════ */
+.marquee-wrap{
+  position:relative;z-index:10;
+  overflow:hidden;padding:20px 0;
+  border-top:1px solid rgba(255,215,0,0.08);
+  border-bottom:1px solid rgba(255,215,0,0.08);
+  margin:0 0 10px;
+}
+.marquee{
+  display:flex;gap:60px;width:max-content;
+  animation:marquee 22s linear infinite;
+}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.marquee-item{
+  font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;
+  color:rgba(255,255,255,0.15);white-space:nowrap;
+}
+.marquee-item span{color:var(--gold);opacity:.6}
+
+/* ═══════════════════ 3D ROTATE RING ═══════════════════ */
+.ring3d-wrap{
+  position:relative;z-index:10;
+  text-align:center;padding:20px 0;
+}
+.ring3d{
+  display:inline-block;
+  width:300px;height:300px;
+  position:relative;perspective:600px;
+}
+.ring3d-inner{
+  width:100%;height:100%;
+  border:2px solid rgba(255,215,0,0.3);border-radius:50%;
+  position:absolute;
+  animation:ring3dSpin 10s linear infinite;
+  box-shadow:0 0 30px rgba(255,215,0,0.1) inset;
+}
+.ring3d-inner:nth-child(2){
+  transform:rotateX(60deg);
+  border-color:rgba(232,0,30,0.3);
+  animation-direction:reverse;animation-duration:14s;
+}
+.ring3d-inner:nth-child(3){
+  transform:rotateY(60deg);
+  border-color:rgba(255,165,0,0.2);
+  animation-duration:18s;
+}
+@keyframes ring3dSpin{from{transform:rotateZ(0) rotateX(var(--rx,0))}to{transform:rotateZ(360deg) rotateX(var(--rx,0))}}
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<!-- Particles -->
+<div id="particles"></div>
+
+<!-- Waveform Top Bar -->
+<div id="wave-top" aria-hidden="true"></div>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section class="hero" id="home">
+  <div class="logo-wrap">
+    <div class="logo-glow"></div>
+    <div class="logo-ring2"></div>
+    <div class="logo-ring"></div>
+    <img class="logo-img" src="Vedank Music.png" alt="Vedank Music" id="heroLogo" onerror="this.style.display='none'">
+    <!-- Fallback SVG logo -->
+    <svg id="svgLogo" width="200" height="200" viewBox="0 0 200 200" style="display:none;position:absolute;top:0;left:0;border-radius:50%">
+      <defs>
+        <radialGradient id="lg1" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#1a0030"/>
+          <stop offset="100%" stop-color="#04020A"/>
+        </radialGradient>
+      </defs>
+      <circle cx="100" cy="100" r="100" fill="url(#lg1)"/>
+      <text x="50%" y="45%" text-anchor="middle" fill="#FFD700" font-family="Bebas Neue" font-size="44" dy=".3em">V</text>
+      <text x="50%" y="68%" text-anchor="middle" fill="#E8001E" font-family="Exo 2" font-size="16" dy=".3em" letter-spacing="3">MUSIC</text>
+    </svg>
+  </div>
+
+  <h1 class="hero-title">
+    <span class="t-gold">VEDANK</span>
+    <span class="t-red">MUSIC</span>
+  </h1>
+
+  <div class="official-badge">
+    <span class="badge-dot"></span>
+    OFFICIAL ARTIST
+    <span class="badge-dot"></span>
+  </div>
+
+  <div class="coming-soon">MUSIC DISTRIBUTION — COMING SOON</div>
+
+  <div class="genres-wrap reveal">
+    <span class="genre-tag">🎵 Phonk</span>
+    <span class="genre-tag">🎸 Spanish</span>
+    <span class="genre-tag">🙏 Devotional</span>
+    <span class="genre-tag">🎤 Rap</span>
+    <span class="genre-tag">🎶 Pop</span>
+    <span class="genre-tag">🥁 Bhojpuri</span>
+    <span class="genre-tag">🎺 Haryanvi</span>
+    <span class="genre-tag">🎻 Punjabi</span>
+    <span class="genre-tag">🎷 Marathi</span>
+    <span class="genre-tag">🪗 Gujarati</span>
+    <span class="genre-tag" style="color:var(--gold);border-color:rgba(255,215,0,0.3)">More...</span>
+  </div>
+
+  <div class="scroll-hint">
+    <span>SCROLL TO EXPLORE</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════ MARQUEE ═══════════════════ -->
+<div class="marquee-wrap" aria-hidden="true">
+  <div class="marquee" id="mq"></div>
+</div>
+
+<!-- ═══════════════════ STREAMING PLATFORMS ═══════════════════ -->
+<section class="section" id="platforms">
+  <div class="bg-glow" style="width:400px;height:400px;background:rgba(255,215,0,0.04);top:-100px;left:-100px"></div>
+  <div class="sec-title reveal"><span style="color:var(--gold)">Streaming</span> <span style="color:var(--red2)">Platforms</span></div>
+  <div class="divider"></div>
+  <div class="sec-sub reveal">YOUR MUSIC — EVERYWHERE</div>
+
+  <div class="platform-grid" id="platform-grid">
+
+    <div class="pcard reveal" style="animation-delay:.1s">
+      <img src="Spotify.gif" alt="Spotify" onerror="this.parentNode.querySelector('.no-img-box') && (this.style.display='none')">
+      <h3>Spotify</h3>
+    </div>
+
+    <div class="pcard reveal" style="animation-delay:.15s">
+      <img src="AppleMusic.gif" alt="Apple Music">
+      <h3>Apple Music</h3>
+    </div>
+
+    <div class="pcard reveal" style="animation-delay:.2s">
+      <img src="YouTube.gif" alt="YouTube Music">
+      <h3>YouTube Music</h3>
+    </div>
+
+    <div class="pcard reveal" style="animation-delay:.25s">
+      <img src="JioSaavan.gif" alt="JioSaavn">
+      <h3>JioSaavn</h3>
+    </div>
+
+    <div class="pcard reveal" style="animation-delay:.3s">
+      <img src="Amazon Music.gif" alt="Amazon Music">
+      <h3>Amazon Music</h3>
+    </div>
+
+    <div class="pcard reveal" style="animation-delay:.35s">
+      <img src="Wynk.gif" alt="Wynk">
+      <h3>Wynk Music</h3>
+    </div>
+
+    <div class="pcard reveal" style="animation-delay:.4s">
+      <img src="Deezer.gif" alt="Deezer">
+      <h3>Deezer</h3>
+    </div>
+
+    <div class="pcard reveal" style="animation-delay:.45s">
+      <img src="Gaana.gif" alt="Gaana">
+      <h3>Gaana</h3>
+    </div>
+
+    <div class="pcard reveal" style="animation-delay:.5s">
+      <img src="Meta.gif" alt="Meta">
+      <h3>Meta</h3>
+    </div>
+
+    <div class="pcard reveal" style="animation-delay:.55s">
+      <img src="Facebook.gif" alt="Facebook">
+      <h3>Facebook</h3>
+    </div>
+
+    <div class="pcard reveal" style="animation-delay:.6s">
+      <img src="Instagram.gif" alt="Instagram">
+      <h3>Instagram</h3>
+    </div>
+
+    <div class="pcard reveal" style="animation-delay:.65s">
+      <img src="Snapchat.gif" alt="Snapchat">
+      <h3>Snapchat</h3>
+    </div>
+
+    <div class="pcard reveal" style="animation-delay:.7s">
+      <img src="Tiktok.gif" alt="TikTok">
+      <h3>TikTok</h3>
+    </div>
+
+    <div class="pcard reveal" style="animation-delay:.75s">
+      <img src="Tidal.gif" alt="Tidal">
+      <h3>Tidal</h3>
+    </div>
+
+    <div class="pcard reveal" style="animation-delay:.8s">
+      <img src="Qoboz.png" alt="Qobuz">
+      <h3>Qobuz</h3>
+    </div>
+
+    <div class="pcard reveal" style="animation-delay:.85s">
+      <img src="YandexMusic.png" alt="Yandex Music">
+      <h3>Yandex Music</h3>
+    </div>
+
+    <div class="pcard reveal" style="animation-delay:.9s">
+      <img src="Bomplay.png" alt="Bomplay">
+      <h3>Bomplay</h3>
+    </div>
+
+    
+    <div class="pcard reveal" style="animation-delay:.95s">
+      <img src="Hungama.png" alt="Hungama">
+      <h3>Hungama</h3>
+    </div>
+
+    <div class="pcard reveal" style="animation-delay:9s">
+      <img src="Resso.png" alt="Resso">
+      <h3>Resso</h3>
+    </div>
+
+    <div class="pcard reveal" style="animation-delay:95s">
+      <img src="Vevo.png" alt="Vevo">
+      <h3>Vevo</h3>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════ CALLER TUNE SECTION ═══════════════════ -->
+<section id="caller-section" style="position:relative;z-index:10">
+  <div class="bg-glow" style="width:500px;height:500px;background:rgba(255,215,0,0.05);top:50%;left:50%;transform:translate(-50%,-50%)"></div>
+  <span class="caller-label">◈ EXCLUSIVE</span>
+
+  <div class="section" style="padding:0 40px">
+    <div class="sec-title reveal">
+      <span style="color:var(--gold)">Caller</span>
+      <span style="color:#fff"> Tune</span>
+      <span style="color:var(--red2)"> Services</span>
+    </div>
+    <div class="divider"></div>
+    <div class="sec-sub reveal">SET YOUR MUSIC AS A CALLER TUNE</div>
+
+    <!-- Animated soundwave decoration -->
+    <div style="display:flex;justify-content:center;gap:3px;margin-bottom:40px;height:40px;align-items:center" aria-hidden="true" id="ct-wave"></div>
+
+    <div class="ct-grid">
+
+      <div class="pcard reveal" style="animation-delay:.95s">
+      <img src="Airtel.gif" alt="Airtel">
+      <h3>Hello Tune</h3>
+      </div>
+
+      <div class="pcard reveal" style="animation-delay:.95s">
+      <img src="Jio.png" alt="Jio Tune">
+      <h3>Jio Tune</h3>
+      </div>
+
+      <div class="pcard reveal" style="animation-delay:.95s">
+      <img src="Vi.gif" alt="Vi">
+      <h3>Vodafone</h3>
+      </div>
+
+      <div class="pcard reveal" style="animation-delay:.95s">
+      <img src="Bsnl.gif" alt="Bsnl">
+      <h3>BSNL</h3>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ EMAIL ═══════════════════ -->
+<div class="email-section">
+  <div class="email-card reveal">
+    <div class="email-label">◈ BUSINESS INQUIRIES ◈</div>
+    <div style="font-family:'Orbitron',sans-serif;font-size:14px;color:rgba(255,255,255,0.5);letter-spacing:3px;margin-bottom:16px">GET IN TOUCH</div>
+    <div class="email-text">vedankmusic@proton.me</div>
+    <div style="margin-top:20px;font-size:12px;color:rgba(255,255,255,0.3);letter-spacing:2px">FOR PARTNERSHIPS • DISTRIBUTION • COLLABORATIONS</div>
+  </div>
+</div>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer>
+  <span style="color:var(--gold)">VEDANK</span> <span style="color:var(--red2)">MUSIC</span>
+  &nbsp;•&nbsp; ALL RIGHTS RESERVED &nbsp;•&nbsp;
+  <span style="color:rgba(255,215,0,0.5)">OFFICIAL DISTRIBUTION</span>
+</footer>
+
+<!-- ══════════════ JAVASCRIPT ══════════════ -->
+<script>
+/* ── Cursor ── */
+const cur=document.getElementById('cur'),ring=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cur.style.left=mx+'px';cur.style.top=my+'px';
+});
+(function animR(){
+  rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(animR);
+})();
+document.querySelectorAll('.pcard,.ct-card,.email-card,.genre-tag').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    cur.style.transform='translate(-50%,-50%) scale(2.5)';
+    cur.style.background='#FF2F2F';
+    ring.style.transform='translate(-50%,-50%) scale(1.6)';
+    ring.style.borderColor='rgba(255,47,47,0.6)';
+  });
+  el.addEventListener('mouseleave',()=>{
+    cur.style.transform='translate(-50%,-50%) scale(1)';
+    cur.style.background='var(--gold)';
+    ring.style.transform='translate(-50%,-50%) scale(1)';
+    ring.style.borderColor='rgba(255,215,0,0.5)';
+  });
+});
+
+/* ── Particles ── */
+const pcon=document.getElementById('particles');
+const COLORS=['#FFD700','#FF2F2F','#FFA500','#ffffff'];
+for(let i=0;i<60;i++){
+  const p=document.createElement('div');
+  p.className='particle';
+  const size=Math.random()*4+1;
+  const color=COLORS[Math.floor(Math.random()*COLORS.length)];
+  const left=Math.random()*100;
+  const dur=Math.random()*15+8;
+  const delay=Math.random()*15;
+  p.style.cssText=`
+    width:${size}px;height:${size}px;
+    left:${left}%;
+    background:${color};
+    animation-duration:${dur}s;
+    animation-delay:-${delay}s;
+    box-shadow:0 0 ${size*3}px ${color};
+  `;
+  pcon.appendChild(p);
+}
+
+/* ── Waveform Top ── */
+const wt=document.getElementById('wave-top');
+for(let i=0;i<55;i++){
+  const b=document.createElement('div');
+  b.className='wbar';
+  const delay=(i/55*1.4).toFixed(2);
+  const dur=(0.7+Math.random()*0.9).toFixed(2);
+  const h=15+Math.random()*55;
+  b.style.cssText=`height:${h}px;animation-delay:${delay}s;animation-duration:${dur}s`;
+  wt.appendChild(b);
+}
+setInterval(()=>{
+  wt.querySelectorAll('.wbar').forEach(b=>{b.style.height=(15+Math.random()*55)+'px'});
+},280);
+
+/* ── Caller Tune Waveform ── */
+const ctw=document.getElementById('ct-wave');
+for(let i=0;i<40;i++){
+  const b=document.createElement('div');
+  b.style.cssText=`
+    width:3px;border-radius:4px;
+    background:linear-gradient(to top,#FFD700,#FFA500);
+    animation:wv ${(0.7+Math.random()).toFixed(2)}s ease-in-out infinite;
+    animation-delay:${(i/40).toFixed(2)}s;
+    height:${15+Math.random()*30}px;
+    box-shadow:0 0 4px #FFD700;
+  `;
+  ctw.appendChild(b);
+}
+setInterval(()=>{
+  ctw.querySelectorAll('div').forEach(b=>{b.style.height=(10+Math.random()*35)+'px'});
+},320);
+
+/* ── Marquee ── */
+const words=['VEDANK MUSIC','<span>◆</span>','OFFICIAL DISTRIBUTION','<span>◆</span>','COMING SOON','<span>◆</span>','STREAMING WORLDWIDE','<span>◆</span>','CALLER TUNES','<span>◆</span>'];
+const mq=document.getElementById('mq');
+const full=[...words,...words];
+full.forEach(w=>{
+  const s=document.createElement('span');
+  s.className='marquee-item';
+  s.innerHTML=w;
+  mq.appendChild(s);
+});
+
+/* ── Scroll Reveal ── */
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      setTimeout(()=>e.target.classList.add('shown'),i*80);
+    }
+  });
+},{threshold:0.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+// Hero reveal immediately
+setTimeout(()=>document.querySelector('.hero .reveal')?.classList.add('shown'),200);
+
+/* ── Card stagger animation offset fix ── */
+document.querySelectorAll('.pcard').forEach((c,i)=>{
+  c.style.animationDelay=(i*0.3)+'s';
+});
+
+/* ── Hero logo: show SVG fallback if image fails ── */
+const heroImg=document.getElementById('heroLogo');
+const svgLogo=document.getElementById('svgLogo');
+heroImg.addEventListener('error',()=>{
+  heroImg.style.display='none';
+  svgLogo.style.display='block';
+});
+</script>
+</body>
+</html>
