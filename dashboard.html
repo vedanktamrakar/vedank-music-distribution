@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vedank Music — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Bebas+Neue&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#FFD700;--red:#E8001E;--red2:#FF2F2F;--bg:#04020A;}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Exo 2',sans-serif;background:var(--bg);color:#fff;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;
+}
+
+/* BG Effects */
+#particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.particle{position:absolute;border-radius:50%;animation:drift linear infinite;opacity:0}
+@keyframes drift{0%{opacity:0;transform:translateY(100vh) scale(0)}10%{opacity:.5}90%{opacity:.3}100%{opacity:0;transform:translateY(-10vh) scale(1.5)}}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(232,0,30,0.1) 0%,transparent 70%),radial-gradient(ellipse 50% 50% at 50% 50%,rgba(255,215,0,0.06) 0%,transparent 70%);pointer-events:none;z-index:1}
+
+/* Grid overlay */
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(255,215,0,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,215,0,0.03) 1px,transparent 1px);
+  background-size:50px 50px;pointer-events:none;z-index:1;
+}
+
+/* Topbar */
+#topbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;height:60px;
+  background:rgba(4,2,10,0.92);
+  border-bottom:1px solid rgba(255,215,0,0.12);
+  backdrop-filter:blur(20px);
+}
+.topbar-brand{
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;
+  background:linear-gradient(90deg,var(--gold),var(--red2));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+#user-name{
+  font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;
+  color:rgba(255,215,0,0.7);
+}
+#btn-logout{
+  background:rgba(255,47,47,0.1);border:1px solid rgba(255,47,47,0.25);
+  border-radius:20px;padding:6px 16px;
+  font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;
+  color:rgba(255,100,100,0.8);cursor:pointer;transition:all .3s;
+}
+#btn-logout:hover{background:rgba(255,47,47,0.2);color:#ff6b6b}
+
+/* Main content */
+.dashboard-wrap{
+  position:relative;z-index:10;
+  text-align:center;padding:20px;
+  max-width:700px;width:100%;
+}
+
+/* Maintenance icon */
+.maintenance-icon{
+  width:120px;height:120px;margin:0 auto 30px;position:relative;
+  animation:iconFloat 4s ease-in-out infinite;
+}
+@keyframes iconFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+.maintenance-icon svg{width:100%;height:100%}
+
+/* Maintenance badge */
+.maint-badge{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:8px 20px;border-radius:50px;
+  background:linear-gradient(135deg,rgba(255,47,47,0.15),rgba(255,47,47,0.05));
+  border:1px solid rgba(255,47,47,0.3);
+  font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:4px;
+  color:#ff6b6b;margin-bottom:24px;
+  animation:badgePulse 2.5s ease-in-out infinite;
+}
+@keyframes badgePulse{0%,100%{box-shadow:0 0 10px rgba(255,47,47,0.2)}50%{box-shadow:0 0 25px rgba(255,47,47,0.4)}}
+.badge-dot{width:8px;height:8px;border-radius:50%;background:#ff6b6b;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* Title */
+.maint-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(40px,10vw,90px);
+  line-height:1;letter-spacing:4px;
+  margin-bottom:10px;
+}
+.maint-title .line1{
+  display:block;color:var(--gold);
+  text-shadow:0 0 30px rgba(255,215,0,0.4),0 0 60px rgba(255,215,0,0.2);
+}
+.maint-title .line2{
+  display:block;color:var(--red2);
+  text-shadow:0 0 30px rgba(255,47,47,0.4);
+}
+
+.maint-sub{
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(14px,3vw,22px);
+  letter-spacing:5px;margin:16px 0 30px;
+  background:linear-gradient(90deg,var(--gold),var(--red2),var(--gold));
+  background-size:300% 100%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shimmer 3s linear infinite;
+}
+@keyframes shimmer{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+
+.maint-desc{
+  font-size:16px;color:rgba(255,255,255,0.55);line-height:1.8;
+  max-width:500px;margin:0 auto 36px;letter-spacing:.5px;
+}
+
+/* Waveform animation */
+.wave-bar-row{
+  display:flex;align-items:center;justify-content:center;
+  gap:4px;height:50px;margin-bottom:30px;
+}
+.wbar{
+  width:4px;border-radius:6px;
+  background:linear-gradient(to top,var(--red),var(--gold));
+  animation:wv 1s ease-in-out infinite;
+  transform-origin:bottom;
+}
+@keyframes wv{0%,100%{transform:scaleY(.1)}50%{transform:scaleY(1)}}
+
+/* Progress bar */
+.progress-wrap{
+  max-width:400px;margin:0 auto 30px;
+}
+.progress-label{
+  display:flex;justify-content:space-between;
+  font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;
+  color:rgba(255,255,255,0.35);margin-bottom:10px;
+}
+.progress-bar{
+  height:4px;border-radius:4px;
+  background:rgba(255,255,255,0.07);overflow:hidden;
+}
+.progress-fill{
+  height:100%;border-radius:4px;
+  background:linear-gradient(90deg,var(--gold),var(--red2));
+  animation:progressAnim 3s ease-in-out infinite alternate;
+  box-shadow:0 0 10px rgba(255,215,0,0.4);
+}
+@keyframes progressAnim{0%{width:60%}100%{width:85%}}
+
+/* Back button */
+.btn-back{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 28px;border-radius:50px;
+  background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(232,0,30,0.08));
+  border:1px solid rgba(255,215,0,0.25);
+  font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:3px;
+  color:var(--gold);cursor:pointer;text-decoration:none;transition:all .3s;
+}
+.btn-back:hover{background:rgba(255,215,0,0.2);box-shadow:0 0 20px rgba(255,215,0,0.2);transform:translateY(-2px)}
+
+/* Greeting */
+.greeting{
+  font-family:'Orbitron',sans-serif;font-size:12px;letter-spacing:3px;
+  color:rgba(255,255,255,0.35);margin-bottom:12px;
+}
+#greeting-name{color:rgba(255,215,0,0.7)}
+</style>
+</head>
+<body>
+
+<div id="particles"></div>
+
+<!-- Topbar -->
+<div id="topbar">
+  <div class="topbar-brand">VEDANK MUSIC</div>
+  <div id="user-name">LOADING...</div>
+  <button id="btn-logout" onclick="doLogout()">LOGOUT</button>
+</div>
+
+<!-- Dashboard Main -->
+<div class="dashboard-wrap">
+
+  <!-- Waveform -->
+  <div class="wave-bar-row" id="wave-row" aria-hidden="true"></div>
+
+  <!-- Maintenance Badge -->
+  <div class="maint-badge">
+    <span class="badge-dot"></span>
+    STATUS: UNDER MAINTENANCE
+    <span class="badge-dot"></span>
+  </div>
+
+  <!-- Greeting -->
+  <div class="greeting">WELCOME BACK, <span id="greeting-name">ARTIST</span></div>
+
+  <!-- Title -->
+  <div class="maint-title">
+    <span class="line1">WEBSITE UNDER</span>
+    <span class="line2">MAINTENANCE</span>
+  </div>
+
+  <div class="maint-sub">COMING SOON</div>
+
+  <div class="maint-desc">
+    We're working hard to bring you the best music distribution platform. 
+    Your dashboard will be ready very soon. Stay tuned!
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>DEVELOPMENT PROGRESS</span>
+      <span id="prog-pct">75%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+  </div>
+
+  <!-- Back button -->
+  <a href="index.html" class="btn-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    BACK TO HOME
+  </a>
+
+</div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDA1t6C0WZOwtjlC_-w0PFuwr0b-mAJEtQ",
+  authDomain: "vedankmusic.firebaseapp.com",
+  projectId: "vedankmusic",
+  storageBucket: "vedankmusic.firebasestorage.app",
+  messagingSenderId: "906382095261",
+  appId: "1:906382095261:web:47950aa259df0687f73574",
+  measurementId: "G-XBT50SJGPY"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    const name = user.displayName || user.email.split('@')[0];
+    document.getElementById('user-name').textContent = name.toUpperCase();
+    document.getElementById('greeting-name').textContent = name.toUpperCase();
+  } else {
+    // Not logged in - redirect to auth
+    window.location.href = 'auth.html';
+  }
+});
+
+window.doLogout = async function() {
+  await signOut(auth);
+  window.location.href = 'index.html';
+};
+</script>
+
+<script>
+// Particles
+const pcon = document.getElementById('particles');
+const COLORS = ['#FFD700','#FF2F2F','#FFA500','#ffffff'];
+for(let i=0;i<50;i++){
+  const p = document.createElement('div'); p.className = 'particle';
+  const size = Math.random()*4+1, color = COLORS[Math.floor(Math.random()*COLORS.length)];
+  p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;background:${color};animation-duration:${Math.random()*15+8}s;animation-delay:-${Math.random()*15}s;box-shadow:0 0 ${size*3}px ${color}`;
+  pcon.appendChild(p);
+}
+
+// Waveform
+const wr = document.getElementById('wave-row');
+for(let i=0;i<40;i++){
+  const b = document.createElement('div'); b.className = 'wbar';
+  const delay = (i/40*1.4).toFixed(2), dur = (0.7+Math.random()*0.9).toFixed(2), h = 10+Math.random()*40;
+  b.style.cssText = `height:${h}px;animation-delay:${delay}s;animation-duration:${dur}s`;
+  wr.appendChild(b);
+}
+setInterval(()=>{ wr.querySelectorAll('.wbar').forEach(b=>{ b.style.height=(10+Math.random()*40)+'px' }) }, 300);
+
+// Animated progress %
+let pct = 75;
+const pctEl = document.getElementById('prog-pct');
+setInterval(() => {
+  pct = 65 + Math.floor(Math.random()*25);
+  pctEl.textContent = pct + '%';
+}, 3000);
+</script>
+</body>
+</html>
