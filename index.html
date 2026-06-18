@@ -119,9 +119,9 @@
   }
   .logo-wrap{
     position:relative;
-    width:min(220px, 46vw);
+    width:min(220px, 46vw) 
+      aspect-ratio:1/1;
     perspective:800px;
-    aspect-ratio:1/1;
   }
   .logo-halo{
     position:absolute;
@@ -137,6 +137,9 @@
   .logo-wrap img{
     position:relative;
     width:100%;
+    height:auto;
+aspect-ratio:1/1;
+object-fit:cover;
     border-radius:50%;
     transform:rotateX(0deg);
     transition:transform .6s var(--ease), filter .6s var(--ease);
