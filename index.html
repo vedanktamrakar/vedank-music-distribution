@@ -165,17 +165,16 @@ object-fit:cover;
     align-items:center;
   }
 
-  .badge-stage{
+.badge-stage{
     position:relative;
-    width:min(190px, 42vw);
+    width:min(700px, 90vw);
     margin:8px auto 28px;
-  }
+} 
   .badge-ring{
     position:absolute;
     inset:-30%;
     border-radius:50%;
-    background:conic-gradient(from 90deg, transparent 0deg, var(--gold-light) 30deg, transparent 70deg, var(--red-light) 180deg, transparent 230deg, var(--gold-light) 330deg, transparent 360deg);
-    animation:spin 9s linear infinite;
+    background:conic-gradient(from 90deg, transparent 0deg, var(--gold-light) 30deg, transparent 70deg, var(--red-light) 180deg, transparent 230deg, var(--gold-light) 330deg, transparent 360deg)
     filter:blur(2px);
   }
   .badge-ring::after{
@@ -185,12 +184,13 @@ object-fit:cover;
     border-radius:50%;
     background:radial-gradient(circle, var(--bg-0) 55%, transparent 100%);
   }
-  .badge-stage img{
+.badge-stage img{
     position:relative;
     width:100%;
+    height:auto;
+    object-fit:contain;
     filter:drop-shadow(0 14px 34px rgba(0,0,0,0.55));
-    animation:badgeFloat 4.5s ease-in-out infinite;
-  }
+} 
   @keyframes badgeFloat{
     0%,100%{ transform:translateY(0) rotate(0deg); }
     50%{ transform:translateY(-9px) rotate(1.5deg); }
@@ -419,8 +419,7 @@ object-fit:cover;
 
 <main>
   <section class="hero" aria-labelledby="hero-heading">
-    <div class="badge-stage reveal">
-      <div class="badge-ring" aria-hidden="true"></div>
+    <div class="badge-stage reveal"> 
       <img src="Artist_Verification_Badge.png" alt="Official Artist Verification Badge" width="190" height="190">
     </div>
 
