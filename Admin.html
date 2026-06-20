@@ -1,0 +1,131 @@
+<!DOCTYPE html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>Vedank Music Admin</title>
+<style>
+body{font-family:Arial;background:#0d0d0d;color:#fff;padding:20px}
+input,select,button{width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #d4af37;background:#171717;color:#fff;box-sizing:border-box}
+button{background:linear-gradient(135deg,#d4af37,#b71c1c);border:none;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.6;cursor:not-allowed}
+.card{max-width:500px;margin:auto;background:#171717;padding:20px;border-radius:16px}
+.row{display:flex;gap:10px}
+.row button{margin:8px 0}
+#msg{min-height:20px;font-weight:bold}
+#msg.ok{color:#4caf50}
+#msg.err{color:#ff5252}
+.btn-secondary{background:#262626;border:1px solid #555}
+.btn-logout{background:#262626;border:1px solid #b71c1c;color:#ff8a80;margin-top:24px}
+hr{border:none;border-top:1px solid #333;margin:18px 0}
+</style></head>
+<body><div class='card'>
+<h2>Vedank Music Admin Panel</h2>
+
+<input id='uid' placeholder='User UID'>
+<button class='btn-secondary' onclick='loadUser()'>Load User Data</button>
+
+<hr>
+
+<input id='name' placeholder='Artist Name'>
+<select id='dist'>
+  <option>Pending</option><option>Approved</option><option>Live</option><option>Rejected</option><option>Issue</option>
+</select>
+<input id='liveDate' placeholder='27 Jun 2026'>
+<select id='oac'>
+  <option>Pending</option><option>Waiting For Approval</option><option>Verified</option><option>Rejected</option><option>Issue</option>
+</select>
+<button id='btnSave' onclick='save()'>Update User Dashboard</button>
+<p id='msg'></p>
+
+<button class='btn-logout' onclick='doLogout()'>Log Out</button>
+</div>
+
+<script type='module'>
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyDA1t6C0WZOwtjlC_-w0PFuwr0b-mAJEtQ',
+  authDomain: 'vedankmusic.firebaseapp.com',
+  projectId: 'vedankmusic',
+  storageBucket: 'vedankmusic.firebasestorage.app',
+  messagingSenderId: '906382095261',
+  appId: '1:906382095261:web:47950aa259df0687f73574'
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+function setMsg(text, isError) {
+  const m = document.getElementById('msg');
+  m.textContent = text;
+  m.className = isError ? 'err' : 'ok';
+}
+
+onAuthStateChanged(auth, async (u) => {
+  if (!u) { location = 'auth.html'; return; }
+  const s = await getDoc(doc(db, 'users', u.uid));
+  if (!s.exists() || s.data().accountType !== 'admin') {
+    location = 'Dashboard.html';
+  }
+});
+
+/** Fetch a user's current Firestore data and pre-fill the form,
+ *  so admin edits the real current values instead of guessing/overwriting blind. */
+window.loadUser = async () => {
+  const uidVal = document.getElementById('uid').value.trim();
+  if (!uidVal) { setMsg('Enter a User UID first.', true); return; }
+
+  setMsg('Loading...', false);
+  try {
+    const snap = await getDoc(doc(db, 'users', uidVal));
+    if (!snap.exists()) { setMsg('No user found with that UID.', true); return; }
+
+    const data = snap.data();
+    document.getElementById('name').value     = data.name || '';
+    document.getElementById('liveDate').value = data.liveDate || '';
+    if (data.distributionStatus) document.getElementById('dist').value = data.distributionStatus;
+    if (data.oacStatus)          document.getElementById('oac').value  = data.oacStatus;
+
+    setMsg('User data loaded. Edit and click Update.', false);
+  } catch (e) {
+    setMsg('Failed to load user: ' + (e.message || e.code || 'unknown error'), true);
+  }
+};
+
+/** Bug fix: the old code did `const uid = uid.value` which referenced
+ *  itself before initialization and threw on every click, so updates
+ *  never actually reached Firestore. Renamed local var to uidVal. */
+window.save = async () => {
+  const uidVal = document.getElementById('uid').value.trim();
+  if (!uidVal) { setMsg('Enter a User UID first.', true); return; }
+
+  const btn = document.getElementById('btnSave');
+  btn.disabled = true;
+  const origText = btn.textContent;
+  btn.textContent = 'Updating...';
+
+  try {
+    await updateDoc(doc(db, 'users', uidVal), {
+      name: document.getElementById('name').value,
+      distributionStatus: document.getElementById('dist').value,
+      oacStatus: document.getElementById('oac').value,
+      liveDate: document.getElementById('liveDate').value
+    });
+    setMsg('Updated successfully ✓', false);
+  } catch (e) {
+    setMsg('Update failed: ' + (e.message || e.code || 'unknown error'), true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = origText;
+  }
+};
+
+window.doLogout = async () => {
+  try {
+    await signOut(auth);
+    location = 'auth.html';
+  } catch (e) {
+    setMsg('Sign-out failed, try again.', true);
+  }
+};
+</script>
+</body></html>
