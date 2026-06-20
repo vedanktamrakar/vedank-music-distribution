@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>Vedank Music Admin</title>
+<style>body{font-family:Arial;background:#0d0d0d;color:#fff;padding:20px}input,select,button{width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #d4af37;background:#171717;color:#fff}button{background:linear-gradient(135deg,#d4af37,#b71c1c);border:none;font-weight:bold} .card{max-width:500px;margin:auto;background:#171717;padding:20px;border-radius:16px}</style></head>
+<body><div class='card'><h2>Vedank Music Admin Panel</h2>
+<input id='uid' placeholder='User UID'>
+<input id='name' placeholder='Artist Name'>
+<select id='dist'><option>Pending</option><option>Approved</option><option>Live</option><option>Rejected</option><option>Issue</option></select>
+<input id='liveDate' placeholder='27 Jun 2026'>
+<select id='oac'><option>Pending</option><option>Waiting For Approval</option><option>Verified</option><option>Rejected</option><option>Issue</option></select>
+<button onclick='save()'>Update User Dashboard</button><p id='msg'></p></div>
+<script type='module'>
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth,onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore,doc,getDoc,updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+const firebaseConfig={apiKey:'AIzaSyDA1t6C0WZOwtjlC_-w0PFuwr0b-mAJEtQ',authDomain:'vedankmusic.firebaseapp.com',projectId:'vedankmusic',storageBucket:'vedankmusic.firebasestorage.app',messagingSenderId:'906382095261',appId:'1:906382095261:web:47950aa259df0687f73574'};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
+onAuthStateChanged(auth,async(u)=>{if(!u)return location='auth.html';const s=await getDoc(doc(db,'users',u.uid));if(!s.exists()||s.data().accountType!=='admin')location='Dashboard.html';});
+window.save=async()=>{const uid=uid.value.trim();await updateDoc(doc(db,'users',uid),{name:name.value,distributionStatus:dist.value,oacStatus:oac.value,liveDate:liveDate.value});msg.textContent='Updated successfully';};
+</script></body></html>
