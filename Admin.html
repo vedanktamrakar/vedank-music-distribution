@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vedank Music — Admin</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+<style>
+  :root{
+    --bg-void:#0D0D0D; --bg-deep:#111111; --bg-card:#171717;
+    --accent-v:#D4AF37; --accent-p:#B71C1C; --accent-c:#F5D67B;
+    --text-1:#F0EDF8; --text-2:rgba(240,237,248,0.62); --text-3:rgba(240,237,248,0.33);
+    --border-lo:rgba(255,255,255,0.08); --border-mid:rgba(255,255,255,0.14);
+    --glass:rgba(255,255,255,0.04); --glass-h:rgba(255,255,255,0.07);
+    --c-green:#00E676; --c-red:#FF3D00; --c-cyan:#F5D67B; --c-orange:#FF9100; --c-yellow:#FFD600; --c-grey:#9C9C9C;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter',sans-serif; background:var(--bg-void); color:var(--text-1);
+    min-height:100vh; padding-bottom:60px;
+  }
+  ::-webkit-scrollbar{width:5px;}
+  ::-webkit-scrollbar-track{background:var(--bg-void);}
+  ::-webkit-scrollbar-thumb{background:var(--accent-v);border-radius:3px;}
+  ::-webkit-scrollbar-thumb:hover{background:var(--accent-p);}
+
+  /* ===== Header ===== */
+  .admin-header{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 24px; background:rgba(9,9,14,0.78);
+    backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border-lo);
+  }
+  .logo{
+    font-family:'Syne',sans-serif; font-size:1.25rem; font-weight:800; letter-spacing:-0.03em;
+  }
+  .logo span{
+    background:linear-gradient(135deg,var(--accent-v),var(--accent-p));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  }
+  .btn-logout-pill{
+    display:flex; align-items:center; gap:8px;
+    background:var(--glass); border:1px solid var(--border-mid); color:var(--text-1);
+    padding:9px 16px; border-radius:30px; cursor:pointer; font-size:0.85rem; font-weight:500;
+    transition:all .2s ease; font-family:'Inter',sans-serif;
+  }
+  .btn-logout-pill:hover{ background:rgba(183,28,28,0.18); border-color:var(--accent-p); }
+
+  /* ===== Layout ===== */
+  .admin-main{ max-width:920px; margin:0 auto; padding:32px 20px 0; display:flex; flex-direction:column; gap:24px; }
+
+  .panel{
+    background:linear-gradient(160deg, rgba(23,23,23,0.85) 0%, rgba(13,13,13,0.85) 100%);
+    border:1px solid var(--border-lo); border-radius:20px; padding:26px;
+    backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+    animation:panelIn .5s ease both;
+  }
+  @keyframes panelIn{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
+
+  .panel-title{ font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:700; margin-bottom:4px; }
+  .panel-sub{ font-size:0.85rem; color:var(--text-3); margin-bottom:18px; }
+
+  .search-row{ display:flex; gap:10px; flex-wrap:wrap; }
+  .search-row input{ flex:1; min-width:200px; }
+
+  input, select{
+    width:100%; padding:13px 14px; border-radius:12px;
+    border:1px solid var(--border-mid); background:var(--bg-card); color:var(--text-1);
+    font-family:'Inter',sans-serif; font-size:0.92rem; outline:none;
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  input:focus, select:focus{ border-color:var(--accent-v); box-shadow:0 0 0 3px rgba(212,175,55,0.15); }
+  input::placeholder{ color:var(--text-3); }
+
+  button{ font-family:'Inter',sans-serif; cursor:pointer; border:none; }
+
+  .btn-primary{
+    background:linear-gradient(135deg,var(--accent-v),var(--accent-p));
+    color:#fff; font-weight:700; padding:13px 22px; border-radius:12px; font-size:0.9rem;
+    transition:transform .2s ease, box-shadow .2s ease; white-space:nowrap;
+  }
+  .btn-primary:hover{ transform:translateY(-1px); box-shadow:0 8px 22px rgba(212,175,55,0.25); }
+  .btn-primary:disabled{ opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
+
+  .btn-secondary{
+    background:var(--glass); border:1px solid var(--border-mid); color:var(--text-1);
+    padding:13px 20px; border-radius:12px; font-size:0.9rem; font-weight:500;
+    transition:background .2s ease;
+  }
+  .btn-secondary:hover{ background:var(--glass-h); }
+
+  .msg{ min-height:18px; font-size:0.84rem; font-weight:600; margin-top:6px; }
+  .msg.ok{ color:var(--c-green); }
+  .msg.err{ color:var(--c-red); }
+
+  /* ===== Selected user panel ===== */
+  .user-panel[hidden]{ display:none; }
+  .user-head{ display:flex; align-items:center; gap:16px; margin-bottom:20px; flex-wrap:wrap; }
+  .user-avatar{
+    width:54px; height:54px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(135deg,var(--accent-v),var(--accent-p));
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Syne',sans-serif; font-weight:800; font-size:1.2rem; color:#fff;
+  }
+  .user-info{ flex:1; min-width:160px; }
+  .user-info h3{ font-family:'Syne',sans-serif; font-size:1.15rem; font-weight:700; }
+  .user-info p{ font-size:0.83rem; color:var(--text-2); }
+  .user-uid{ font-family:monospace; font-size:0.76rem !important; color:var(--text-3) !important; word-break:break-all; }
+  .account-badge{
+    padding:5px 13px; border-radius:30px; font-size:0.72rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.05em;
+    background:rgba(212,175,55,0.15); color:var(--accent-v); border:1px solid rgba(212,175,55,0.35);
+    align-self:flex-start;
+  }
+
+  .migrate-banner{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    background:rgba(255,145,0,0.1); border:1px solid rgba(255,145,0,0.35);
+    color:var(--c-orange); padding:12px 16px; border-radius:12px; margin-bottom:20px; font-size:0.84rem;
+  }
+  .migrate-banner button{
+    margin-left:auto; background:var(--c-orange); color:#1a1a1a; font-weight:700;
+    padding:8px 14px; border-radius:9px; font-size:0.78rem;
+  }
+
+  .analytics-header-row{
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; gap:12px; flex-wrap:wrap;
+  }
+  .analytics-header-row h3{ font-family:'Syne',sans-serif; font-size:1.05rem; font-weight:700; }
+  .btn-add{
+    display:flex; align-items:center; gap:8px;
+    background:linear-gradient(135deg,var(--accent-v),var(--accent-p)); color:#fff;
+    padding:10px 18px; border-radius:30px; font-weight:700; font-size:0.84rem;
+    transition:transform .2s ease;
+  }
+  .btn-add:hover{ transform:translateY(-1px); }
+
+  /* ===== Analytics cards ===== */
+  .analytics-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:16px; }
+
+  @property --spin{ syntax:'<angle>'; initial-value:0deg; inherits:false; }
+
+  .a-card{ position:relative; border-radius:18px; padding:2px; }
+  .a-card-ring{
+    position:absolute; inset:0; border-radius:18px;
+    background:conic-gradient(from var(--spin,0deg),
+      transparent 0deg 30deg, var(--card-color,#D4AF37) 30deg 80deg,
+      transparent 80deg 190deg, var(--card-color,#D4AF37) 190deg 240deg, transparent 240deg 360deg);
+    animation:spinCard 5s linear infinite;
+  }
+  @keyframes spinCard{ from{--spin:0deg;} to{--spin:360deg;} }
+
+  .a-card-bg{
+    position:relative; z-index:1; background:linear-gradient(160deg,#141228 0%,#0E0A1C 100%);
+    border-radius:16px; padding:18px;
+  }
+  .a-card.card-enter{ animation:cardPopIn .5s cubic-bezier(.34,1.56,.64,1) both; }
+  @keyframes cardPopIn{ 0%{opacity:0; transform:translateY(14px) scale(.96);} 100%{opacity:1; transform:translateY(0) scale(1);} }
+  @keyframes flashUpdate{ 0%{opacity:1;transform:scale(1);} 25%{opacity:.6;transform:scale(.97);} 65%{opacity:1;transform:scale(1.02);} 100%{opacity:1;transform:scale(1);} }
+  .a-card.updating .a-card-bg{ animation:flashUpdate .5s ease; }
+
+  .a-card-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:14px; }
+  .a-card-name{ font-family:'Syne',sans-serif; font-size:1.05rem; font-weight:700; overflow-wrap:anywhere; }
+  .a-card-actions{ display:flex; gap:6px; flex-shrink:0; }
+  .icon-btn{
+    width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    background:var(--glass); border:1px solid var(--border-mid); color:var(--text-2); font-size:0.78rem;
+    transition:all .2s ease;
+  }
+  .icon-btn:hover{ background:var(--glass-h); color:var(--text-1); }
+  .icon-btn.danger:hover{ background:rgba(255,61,0,0.15); border-color:var(--c-red); color:var(--c-red); }
+
+  .a-metric-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+  .a-metric{
+    background:rgba(255,255,255,0.03); border:1px solid var(--border-lo); border-radius:12px;
+    padding:11px 10px; display:flex; flex-direction:column; gap:7px;
+  }
+  .a-metric-label{
+    font-size:0.6rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-3);
+  }
+  .a-badge{
+    display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:30px;
+    font-size:0.7rem; font-weight:700; width:fit-content;
+  }
+  .a-badge-dot{ width:6px; height:6px; border-radius:50%; background:currentColor; }
+
+  .a-live-date{ font-size:0.78rem; color:var(--text-3); display:flex; align-items:center; gap:7px; }
+
+  .empty-grid-msg{
+    grid-column:1/-1; text-align:center; padding:40px 16px; color:var(--text-3); font-size:0.9rem;
+  }
+  .empty-grid-msg i{ font-size:1.8rem; display:block; margin-bottom:10px; color:var(--text-3); }
+
+  /* ===== Modal ===== */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.68); backdrop-filter:blur(8px);
+    z-index:900; display:flex; align-items:center; justify-content:center; padding:20px;
+    opacity:0; visibility:hidden; transition:opacity .25s ease, visibility .25s ease;
+  }
+  .modal-overlay.open{ opacity:1; visibility:visible; }
+  .modal{
+    background:#13101E; border:1px solid var(--border-mid); border-radius:22px;
+    width:100%; max-width:440px; padding:28px; transform:scale(.96); transition:transform .25s ease;
+    max-height:90vh; overflow-y:auto;
+  }
+  .modal-overlay.open .modal{ transform:scale(1); }
+  .modal h3{ font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:700; margin-bottom:18px; }
+  .field-group{ margin-bottom:14px; }
+  .field-label{ font-size:0.78rem; font-weight:600; color:var(--text-2); margin-bottom:6px; display:block; }
+  .modal-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+
+  /* ===== Toasts ===== */
+  #toast-container{ position:fixed; bottom:20px; right:20px; left:20px; z-index:1000; display:flex; flex-direction:column; gap:10px; align-items:flex-end; pointer-events:none; }
+  .toast{
+    pointer-events:auto; display:flex; align-items:flex-start; gap:10px; max-width:340px; width:100%;
+    background:rgba(20,18,30,0.95); border:1px solid var(--border-mid); border-radius:14px; padding:13px 14px;
+    backdrop-filter:blur(16px); transform:translateX(20px); opacity:0; transition:all .3s ease;
+  }
+  .toast.show{ transform:translateX(0); opacity:1; }
+  .toast.hiding{ opacity:0; transform:translateX(20px); }
+  .toast-icon{ font-size:1.1rem; margin-top:1px; }
+  .toast-success .toast-icon{ color:var(--c-green); }
+  .toast-error .toast-icon{ color:var(--c-red); }
+  .toast-info .toast-icon{ color:var(--accent-c); }
+  .toast-title{ font-size:0.85rem; font-weight:700; margin-bottom:2px; }
+  .toast-msg{ font-size:0.78rem; color:var(--text-2); }
+  .toast-x{ background:none; border:none; color:var(--text-3); cursor:pointer; font-size:0.8rem; margin-left:auto; }
+
+  @media (max-width:600px){
+    .admin-main{ padding:24px 14px 0; }
+    .panel{ padding:20px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="admin-header">
+  <div class="logo">Vedank Music <span>Admin</span></div>
+  <button class="btn-logout-pill" id="btn-logout" onclick="doLogout()">
+    <i class="fas fa-right-from-bracket" aria-hidden="true"></i> Log Out
+  </button>
+</header>
+
+<main class="admin-main">
+
+  <!-- ─── SEARCH PANEL ─── -->
+  <section class="panel">
+    <h2 class="panel-title">Find a User</h2>
+    <p class="panel-sub">Search by UID or email address.</p>
+    <div class="search-row">
+      <input id="search-input" placeholder="Enter UID or email…" autocomplete="off"
+             onkeydown="if(event.key==='Enter') searchUser()" />
+      <button class="btn-primary" id="btn-search" onclick="searchUser()">
+        <i class="fas fa-magnifying-glass" aria-hidden="true"></i> Search
+      </button>
+    </div>
+    <p id="search-msg" class="msg"></p>
+  </section>
+
+  <!-- ─── SELECTED USER PANEL ─── -->
+  <section class="panel user-panel" id="user-panel" hidden>
+
+    <div class="user-head">
+      <div class="user-avatar" id="user-avatar">A</div>
+      <div class="user-info">
+        <h3 id="user-name">—</h3>
+        <p id="user-email">—</p>
+        <p class="user-uid" id="user-uid-display">—</p>
+      </div>
+      <span class="account-badge" id="user-account-badge">user</span>
+    </div>
+
+    <div class="migrate-banner" id="migrate-banner" hidden>
+      <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+      <span>Legacy status fields found directly on this profile.</span>
+      <button onclick="migrateLegacyFields()" id="btn-migrate">Migrate Now</button>
+    </div>
+
+    <div class="analytics-header-row">
+      <h3>Analytics Requests</h3>
+      <button class="btn-add" onclick="openAnalyticsModal()">
+        <i class="fas fa-plus" aria-hidden="true"></i> Add New
+      </button>
+    </div>
+
+    <div class="analytics-grid" id="analytics-grid" aria-live="polite"></div>
+  </section>
+
+</main>
+
+<!-- ─── ADD / EDIT ANALYTICS MODAL ─── -->
+<div class="modal-overlay" id="analytics-modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <h3 id="modal-title">Add Analytics</h3>
+
+    <div class="field-group">
+      <label class="field-label" for="f-customer-name">Customer Name</label>
+      <input id="f-customer-name" placeholder="e.g. Artist A" />
+    </div>
+
+    <div class="field-group">
+      <label class="field-label" for="f-dist">Distribution Status</label>
+      <select id="f-dist">
+        <option>Pending</option>
+        <option>Approved</option>
+        <option>Live</option>
+        <option>Rejected</option>
+        <option>Issue</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label" for="f-oac">OAC Status</label>
+      <select id="f-oac">
+        <option>Pending</option>
+        <option>Waiting For Approval</option>
+        <option>Verified</option>
+        <option>Rejected</option>
+        <option>Issue</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label" for="f-live-date">Live Date</label>
+      <input id="f-live-date" placeholder="e.g. 27 Jun 2026" />
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeAnalyticsModal()">Cancel</button>
+      <button class="btn-primary" id="btn-modal-save" onclick="saveAnalyticsForm()">
+        <i class="fas fa-check" aria-hidden="true"></i> Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import {
+  getFirestore, doc, getDoc, updateDoc, deleteField,
+  collection, query, where, orderBy, getDocs, onSnapshot,
+  addDoc, deleteDoc, serverTimestamp
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyDA1t6C0WZOwtjlC_-w0PFuwr0b-mAJEtQ',
+  authDomain: 'vedankmusic.firebaseapp.com',
+  projectId: 'vedankmusic',
+  storageBucket: 'vedankmusic.firebasestorage.app',
+  messagingSenderId: '906382095261',
+  appId: '1:906382095261:web:47950aa259df0687f73574'
+};
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+/* ──────────────────────────────────────────────────────
+   STATUS COLOR CONFIG — shared by Song Distribution & OAC pills
+────────────────────────────────────────────────────── */
+const STATUS_CFG = {
+  'Pending':              { color:'#9C9C9C', iconCls:'fas fa-hourglass-half',      bg:'rgba(156,156,156,0.14)' },
+  'Approved':             { color:'#00E676', iconCls:'fas fa-circle-check',        bg:'rgba(0,230,118,0.14)'   },
+  'Rejected':             { color:'#FF3D00', iconCls:'fas fa-circle-xmark',        bg:'rgba(255,61,0,0.14)'    },
+  'Live':                 { color:'#F5D67B', iconCls:'fas fa-tower-broadcast',     bg:'rgba(245,214,123,0.14)' },
+  'Issue':                { color:'#FF9100', iconCls:'fas fa-triangle-exclamation',bg:'rgba(255,145,0,0.14)'   },
+  'Waiting For Approval': { color:'#FFD600', iconCls:'fas fa-clock',               bg:'rgba(255,214,0,0.14)'   },
+  'Verified':              { color:'#00E676', iconCls:'fas fa-shield-halved',       bg:'rgba(0,230,118,0.14)'   }
+};
+const FALLBACK_CFG = { color:'#9C9C9C', iconCls:'fas fa-circle-question', bg:'rgba(156,156,156,0.14)' };
+
+/* ──────────────────────────────────────────────────────
+   STATE
+────────────────────────────────────────────────────── */
+let currentAdminUid   = null;
+let selectedUid       = null;
+let selectedUserData  = null;
+let analyticsUnsub    = null;   // unsubscribe fn for the selected user's analytics listener
+let analyticsCache    = [];     // last snapshot of analytics docs for the selected user
+let editingAnalyticsId = null;  // null = "add" mode, otherwise the doc id being edited
+let analyticsRenderedOnce = false;
+
+/* ──────────────────────────────────────────────────────
+   HELPERS
+────────────────────────────────────────────────────── */
+function escHtml(str){
+  return String(str ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function setSearchMsg(text, isError){
+  const m = document.getElementById('search-msg');
+  m.textContent = text;
+  m.className = 'msg ' + (isError ? 'err' : 'ok');
+}
+
+const TOAST_ICONS = { success:'fa-circle-check', error:'fa-circle-xmark', info:'fa-circle-info', warning:'fa-triangle-exclamation' };
+function showToast(type, title, message, duration = 4200){
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.setAttribute('role', 'alert');
+  toast.innerHTML = `
+    <div class="toast-icon" aria-hidden="true"><i class="fas ${TOAST_ICONS[type] || 'fa-bell'}"></i></div>
+    <div class="toast-body">
+      <p class="toast-title">${escHtml(title)}</p>
+      <p class="toast-msg">${escHtml(message)}</p>
+    </div>
+    <button class="toast-x" aria-label="Dismiss notification"><i class="fas fa-times"></i></button>`;
+  toast.querySelector('.toast-x').onclick = () => dismissToast(toast);
+  container.appendChild(toast);
+  requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('show')));
+  toast._t = setTimeout(() => dismissToast(toast), duration);
+}
+function dismissToast(toast){
+  if (!toast || toast._dismissed) return;
+  toast._dismissed = true;
+  clearTimeout(toast._t);
+  toast.classList.remove('show');
+  toast.classList.add('hiding');
+  setTimeout(() => toast.remove(), 300);
+}
+
+/* ──────────────────────────────────────────────────────
+   AUTH GATE — only accountType === 'admin' may stay here
+────────────────────────────────────────────────────── */
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { window.location.href = 'auth.html'; return; }
+
+  try {
+    const s = await getDoc(doc(db, 'users', user.uid));
+    if (!s.exists() || s.data().accountType !== 'admin') {
+      window.location.href = 'Dashboard.html';
+      return;
+    }
+    currentAdminUid = user.uid;
+  } catch (e) {
+    console.warn('[VM Admin] Admin check failed:', e);
+    window.location.href = 'Dashboard.html';
+  }
+});
+
+window.doLogout = async function(){
+  const btn = document.getElementById('btn-logout');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing out...'; }
+  try {
+    if (analyticsUnsub) analyticsUnsub();
+    await signOut(auth);
+    window.location.href = 'auth.html';
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-right-from-bracket"></i> Log Out'; }
+    showToast('error', 'Sign-out failed', 'Please try again.');
+  }
+};
+
+/* ──────────────────────────────────────────────────────
+   SEARCH — by UID or email (single smart input)
+────────────────────────────────────────────────────── */
+window.searchUser = async function(){
+  const raw = document.getElementById('search-input').value.trim();
+  if (!raw) { setSearchMsg('Enter a UID or email first.', true); return; }
+
+  const btn = document.getElementById('btn-search');
+  btn.disabled = true;
+  const origHtml = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+  setSearchMsg('Searching...', false);
+
+  try {
+    let foundId = null, foundData = null;
+
+    if (raw.includes('@')) {
+      // Email search
+      const q = query(collection(db, 'users'), where('email', '==', raw.toLowerCase()));
+      const results = await getDocs(q);
+      if (!results.empty) {
+        foundId = results.docs[0].id;
+        foundData = results.docs[0].data();
+      }
+    } else {
+      // UID search
+      const snap = await getDoc(doc(db, 'users', raw));
+      if (snap.exists()) { foundId = raw; foundData = snap.data(); }
+    }
+
+    if (!foundId) {
+      setSearchMsg('No user found. Check the UID or email and try again.', true);
+      document.getElementById('user-panel').hidden = true;
+      return;
+    }
+
+    selectUser(foundId, foundData);
+    setSearchMsg(`User found: ${foundData.name || foundData.email || foundId}`, false);
+  } catch (e) {
+    setSearchMsg('Search failed: ' + (e.message || e.code || 'unknown error'), true);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = origHtml;
+  }
+};
+
+/* ──────────────────────────────────────────────────────
+   SELECTED USER — render profile, subscribe to analytics
+────────────────────────────────────────────────────── */
+function selectUser(uid, data){
+  selectedUid = uid;
+  selectedUserData = data;
+
+  document.getElementById('user-panel').hidden = false;
+
+  const name = data.name || 'Unnamed User';
+  document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('user-name').textContent = name;
+  document.getElementById('user-email').textContent = data.email || '—';
+  document.getElementById('user-uid-display').textContent = uid;
+
+  const badge = document.getElementById('user-account-badge');
+  badge.textContent = data.accountType || 'user';
+
+  // Legacy-field migration banner
+  const legacyPresent = ('distributionStatus' in data) || ('oacStatus' in data) || ('liveDate' in data);
+  document.getElementById('migrate-banner').hidden = !legacyPresent;
+
+  // (Re)subscribe to this user's analytics subcollection
+  if (analyticsUnsub) analyticsUnsub();
+  analyticsRenderedOnce = false;
+  const aq = query(collection(db, 'users', uid, 'analytics'), orderBy('createdAt', 'desc'));
+  analyticsUnsub = onSnapshot(aq, (qsnap) => {
+    analyticsCache = qsnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderAnalyticsGrid(analyticsCache);
+    analyticsRenderedOnce = true;
+  }, (err) => {
+    console.warn('[VM Admin] Analytics listener error:', err);
+    showToast('error', 'Load Failed', 'Could not load analytics for this user.');
+  });
+}
+
+/* ──────────────────────────────────────────────────────
+   RENDER ANALYTICS GRID
+────────────────────────────────────────────────────── */
+function buildMetric(label, status){
+  const cfg = STATUS_CFG[status] || FALLBACK_CFG;
+  return `
+    <div class="a-metric">
+      <span class="a-metric-label">${escHtml(label)}</span>
+      <span class="a-badge" style="background:${cfg.bg}; color:${cfg.color};">
+        <span class="a-badge-dot" aria-hidden="true"></span> ${escHtml(status)}
+      </span>
+    </div>`;
+}
+
+function buildCard(item){
+  const dist = item.distributionStatus || 'Pending';
+  const oac  = item.oacStatus || 'Pending';
+  const ringColor = (STATUS_CFG[dist] || FALLBACK_CFG).color;
+  const liveTxt = item.liveDate ? escHtml(item.liveDate) : 'Not set';
+
+  return `
+    <div class="a-card card-enter" style="--card-color:${ringColor};" data-id="${escHtml(item.id)}">
+      <div class="a-card-ring" aria-hidden="true"></div>
+      <div class="a-card-bg">
+        <div class="a-card-top">
+          <h4 class="a-card-name">${escHtml(item.customerName || 'Untitled')}</h4>
+          <div class="a-card-actions">
+            <button class="icon-btn" title="Edit" onclick="openAnalyticsModal('${escHtml(item.id)}')">
+              <i class="fas fa-pen" aria-hidden="true"></i>
+            </button>
+            <button class="icon-btn danger" title="Delete" onclick="deleteAnalytics('${escHtml(item.id)}')">
+              <i class="fas fa-trash" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+        <div class="a-metric-grid">
+          ${buildMetric('Song Distribution', dist)}
+          ${buildMetric('OAC Certification', oac)}
+        </div>
+        <p class="a-live-date"><i class="fas fa-calendar-day" aria-hidden="true"></i> Live Date: ${liveTxt}</p>
+      </div>
+    </div>`;
+}
+
+function renderAnalyticsGrid(items){
+  const grid = document.getElementById('analytics-grid');
+  if (!items || items.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-grid-msg">
+        <i class="fas fa-folder-open" aria-hidden="true"></i>
+        No analytics requests yet for this user. Click "Add New" to create one.
+      </div>`;
+    return;
+  }
+  grid.innerHTML = items.map(buildCard).join('');
+}
+
+/* ──────────────────────────────────────────────────────
+   ADD / EDIT MODAL
+────────────────────────────────────────────────────── */
+window.openAnalyticsModal = function(analyticsId){
+  if (!selectedUid) { showToast('warning', 'No User Selected', 'Search and select a user first.'); return; }
+
+  editingAnalyticsId = analyticsId || null;
+  const overlay = document.getElementById('analytics-modal-overlay');
+  const title    = document.getElementById('modal-title');
+
+  if (editingAnalyticsId) {
+    const item = analyticsCache.find(a => a.id === editingAnalyticsId);
+    if (!item) { showToast('error', 'Not Found', 'That record no longer exists.'); return; }
+    title.textContent = 'Edit Analytics';
+    document.getElementById('f-customer-name').value = item.customerName || '';
+    document.getElementById('f-dist').value = item.distributionStatus || 'Pending';
+    document.getElementById('f-oac').value  = item.oacStatus || 'Pending';
+    document.getElementById('f-live-date').value = item.liveDate || '';
+  } else {
+    title.textContent = 'Add Analytics';
+    document.getElementById('f-customer-name').value = '';
+    document.getElementById('f-dist').value = 'Pending';
+    document.getElementById('f-oac').value  = 'Pending';
+    document.getElementById('f-live-date').value = '';
+  }
+
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('f-customer-name').focus(), 80);
+};
+
+window.closeAnalyticsModal = function(){
+  document.getElementById('analytics-modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  editingAnalyticsId = null;
+};
+
+window.handleOverlayClick = function(e){
+  if (e.target === document.getElementById('analytics-modal-overlay')) closeAnalyticsModal();
+};
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('analytics-modal-overlay').classList.contains('open')) {
+    closeAnalyticsModal();
+  }
+});
+
+window.saveAnalyticsForm = async function(){
+  if (!selectedUid) { showToast('warning', 'No User Selected', 'Search and select a user first.'); return; }
+
+  const customerName = document.getElementById('f-customer-name').value.trim();
+  const distributionStatus = document.getElementById('f-dist').value;
+  const oacStatus = document.getElementById('f-oac').value;
+  const liveDate = document.getElementById('f-live-date').value.trim();
+
+  if (!customerName) { showToast('error', 'Validation Error', 'Customer Name is required.'); return; }
+
+  const btn = document.getElementById('btn-modal-save');
+  btn.disabled = true;
+  const origHtml = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+  try {
+    if (editingAnalyticsId) {
+      await updateDoc(doc(db, 'users', selectedUid, 'analytics', editingAnalyticsId), {
+        customerName, distributionStatus, oacStatus, liveDate
+      });
+      showToast('success', 'Updated', `${customerName}'s record was updated.`);
+    } else {
+      await addDoc(collection(db, 'users', selectedUid, 'analytics'), {
+        customerName, distributionStatus, oacStatus, liveDate,
+        createdAt: serverTimestamp()
+      });
+      showToast('success', 'Added', `${customerName}'s record was created.`);
+    }
+    closeAnalyticsModal();
+  } catch (e) {
+    showToast('error', 'Save Failed', e.message || e.code || 'Unknown error.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = origHtml;
+  }
+};
+
+/* ──────────────────────────────────────────────────────
+   DELETE
+────────────────────────────────────────────────────── */
+window.deleteAnalytics = async function(analyticsId){
+  if (!selectedUid) return;
+  const item = analyticsCache.find(a => a.id === analyticsId);
+  const label = item ? (item.customerName || 'this record') : 'this record';
+
+  if (!window.confirm(`Delete the analytics record for "${label}"? This cannot be undone.`)) return;
+
+  try {
+    await deleteDoc(doc(db, 'users', selectedUid, 'analytics', analyticsId));
+    showToast('success', 'Deleted', `"${label}" was removed.`);
+  } catch (e) {
+    showToast('error', 'Delete Failed', e.message || e.code || 'Unknown error.');
+  }
+};
+
+/* ──────────────────────────────────────────────────────
+   LEGACY MIGRATION
+   ──────────────────────────────────────────────────────
+   Older profiles stored distributionStatus/oacStatus/liveDate directly
+   on users/{uid}. This moves any such data into a fresh document under
+   users/{uid}/analytics and then strips those fields from the profile,
+   so the users collection holds profile info only.
+────────────────────────────────────────────────────── */
+window.migrateLegacyFields = async function(){
+  if (!selectedUid || !selectedUserData) return;
+
+  const btn = document.getElementById('btn-migrate');
+  btn.disabled = true;
+  const origHtml = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Migrating...';
+
+  try {
+    const d = selectedUserData;
+    await addDoc(collection(db, 'users', selectedUid, 'analytics'), {
+      customerName: d.name || 'Migrated Record',
+      distributionStatus: d.distributionStatus || 'Pending',
+      oacStatus: d.oacStatus || 'Pending',
+      liveDate: d.liveDate || '',
+      createdAt: serverTimestamp()
+    });
+
+    await updateDoc(doc(db, 'users', selectedUid), {
+      distributionStatus: deleteField(),
+      oacStatus: deleteField(),
+      liveDate: deleteField()
+    });
+
+    delete selectedUserData.distributionStatus;
+    delete selectedUserData.oacStatus;
+    delete selectedUserData.liveDate;
+    document.getElementById('migrate-banner').hidden = true;
+
+    showToast('success', 'Migrated', 'Legacy fields moved into the analytics subcollection.');
+  } catch (e) {
+    showToast('error', 'Migration Failed', e.message || e.code || 'Unknown error.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = origHtml;
+  }
+};
+</script>
+</body>
+</html>
